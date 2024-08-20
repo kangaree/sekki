@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Sekki Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f5f5f5;
+            transition: background-color 0.5s ease;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="japanese-name">Loading...</h1>
+        <h2 id="english-meaning">Loading...</h2>
+        <p id="dates">Loading...</p>
+        <div>
+            <button onclick="prevSekki()">Previous</button>
+            <button onclick="nextSekki()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const sekkiData = [
+            { name: "東風解凍", meaning: "The east wind melts the thick ice.", start: "02-04", end: "02-08" },
+            { name: "黄鶯睍睆", meaning: "Bush warblers sing in the countryside.", start: "02-09", end: "02-13" },
+            { name: "魚上氷", meaning: "Ice cracks, allowing fish to emerge.", start: "02-14", end: "02-18" },
+            { name: "土脉潤起", meaning: "Rain falls, moistening the soil.", start: "02-19", end: "02-23" },
+            { name: "霞始靆", meaning: "Mist lies over the land.", start: "02-24", end: "02-28" },
+            { name: "草木萌動", meaning: "Trees and plants put forth buds.", start: "03-01", end: "03-05" },
+            { name: "蟄虫啓戸", meaning: "Hibernating insects emerge.", start: "03-06", end: "03-10" },
+            { name: "桃始笑", meaning: "Peach trees begin to bloom.", start: "03-11", end: "03-15" },
+            { name: "菜虫化蝶", meaning: "Cabbage whites emerge from their cocoons.", start: "03-16", end: "03-20" },
+            { name: "雀始巣", meaning: "Sparrows begin building their nests.", start: "03-21", end: "03-25" },
+            { name: "櫻始開", meaning: "Cherry blossoms begin to bloom.", start: "03-26", end: "03-30" },
+            { name: "雷乃発声", meaning: "Thunder rumbles far away.", start: "03-31", end: "04-04" },
+            { name: "玄鳥至", meaning: "Swallows return from the south.", start: "04-05", end: "04-09" },
+            { name: "鴻雁北", meaning: "Wild geese fly north.", start: "04-10", end: "04-14" },
+            { name: "虹始見", meaning: "Rainbows begin to appear.", start: "04-15", end: "04-19" },
+            { name: "葭始生", meaning: "Reeds begin to sprout.", start: "04-20", end: "04-24" },
+            { name: "霜止出苗", meaning: "Rice seedlings grow.", start: "04-25", end: "04-29" },
+            { name: "牡丹華", meaning: "Peonies bloom.", start: "04-30", end: "05-04" },
+            { name: "蛙始鳴", meaning: "Frogs begin croaking.", start: "05-05", end: "05-09" },
+            { name: "蚯蚓出", meaning: "Worms wriggle to the surface.", start: "05-10", end: "05-14" },
+            { name: "竹笋生", meaning: "Bamboo shoots sprout.", start: "05-15", end: "05-20" },
+            { name: "蚕起食桑", meaning: "Silkworms feast on mulberry leaves.", start: "05-21", end: "05-25" },
+            { name: "紅花栄", meaning: "Safflowers bloom in abundance.", start: "05-26", end: "05-30" },
+            { name: "麦秋至", meaning: "Barley ripens, ready to be harvested.", start: "05-31", end: "06-05" },
+            { name: "蟷螂生", meaning: "Praying mantises hatch and come forth.", start: "06-06", end: "06-10" },
+            { name: "腐草為螢", meaning: "Fireflies fly out from moist grass.", start: "06-11", end: "06-15" },
+            { name: "梅子黄", meaning: "Plums ripen, turning yellow.", start: "06-16", end: "06-20" },
+            { name: "乃東枯", meaning: "Prunella flowers wither.", start: "06-21", end: "06-26" },
+            { name: "菖蒲華", meaning: "Irises bloom.", start: "06-27", end: "07-01" },
+            { name: "半夏生", meaning: "Crowdipper sprouts.", start: "07-02", end: "07-06" },
+            { name: "温風至", meaning: "Warm winds blow.", start: "07-07", end: "07-11" },
+            { name: "蓮始開", meaning: "Lotuses begin to bloom.", start: "07-12", end: "07-16" },
+            { name: "鷹乃学習", meaning: "Young hawks learn to fly.", start: "07-17", end: "07-22" },
+            { name: "桐始結花", meaning: "Paulownia trees begin to produce seeds.", start: "07-23", end: "07-28" },
+            { name: "土潤溽暑", meaning: "The ground is damp, the air hot and humid.", start: "07-29", end: "08-02" },
+            { name: "大雨時行", meaning: "Heavy rains fall.", start: "08-03", end: "08-07" },
+            { name: "涼風至", meaning: "Cool winds blow.", start: "08-08", end: "08-12" },
+            { name: "寒蝉鳴", meaning: "Evening cicadas begin to sing.", start: "08-13", end: "08-17" },
+            { name: "蒙霧升降", meaning: "Thick fog blankets the land.", start: "08-18", end: "08-22" },
+            { name: "綿柎開", meaning: "Cotton bolls open.", start: "08-23", end: "08-27" },
+            { name: "天地始粛", meaning: "The heat finally relents.", start: "08-28", end: "09-01" },
+            { name: "禾乃登", meaning: "Rice ripens.", start: "09-02", end: "09-07" },
+            { name: "草露白", meaning: "White dew shimmers on the grass.", start: "09-08", end: "09-12" },
+            { name: "鶺鴒鳴", meaning: "Wagtails sing.", start: "09-13", end: "09-17" },
+            { name: "玄鳥去", meaning: "Swallows return to the south.", start: "09-18", end: "09-22" },
+            { name: "雷乃収声", meaning: "Thunder comes to an end.", start: "09-23", end: "09-27" },
+            { name: "蟄虫坏戸", meaning: "Insects close up their burrows.", start: "09-28", end: "10-02" },
+            { name: "水始涸", meaning: "Fields are drained of water.", start: "10-03", end: "10-07" },
+            { name: "鴻雁来", meaning: "Wild geese begin to fly back.", start: "10-08", end: "10-12" },
+            { name: "菊花開", meaning: "Chrysanthemums bloom.", start: "10-13", end: "10-17" },
+            { name: "蟋蟀在戸", meaning: "Crickets chirp by the door.", start: "10-18", end: "10-22" },
+            { name: "霜始降", meaning: "Frost begins to form.", start: "10-23", end: "10-27" },
+            { name: "霎時施", meaning: "Drizzling rain falls gently.", start: "10-28", end: "11-01" },
+            { name: "楓蔦黄", meaning: "Maple leaves and ivy turn yellow.", start: "11-02", end: "11-06" },
+            { name: "山茶始開", meaning: "Sasanqua camellias begin to bloom.", start: "11-07", end: "11-11" },
+            { name: "地始凍", meaning: "The land begins to freeze.", start: "11-12", end: "11-16" },
+            { name: "金盞香", meaning: "Daffodils bloom.", start: "11-17", end: "11-21" },
+            { name: "虹蔵不見", meaning: "Rainbows disappear.", start: "11-22", end: "11-26" },
+            { name: "朔風払葉", meaning: "The north wind blows leaves off the trees.", start: "11-27", end: "12-01" },
+            { name: "橘始黄", meaning: "Tachibana citrus trees begin to turn yellow.", start: "12-02", end: "12-06" },
+            { name: "閉塞成冬", meaning: "The skies stay cold as winter arrives.", start: "12-07", end: "12-11" },
+            { name: "熊蟄穴", meaning: "Bears hide away in their dens to hibernate.", start: "12-12", end: "12-16" },
+            { name: "鱖魚群", meaning: "Salmon swim upstream en masse.", start: "12-17", end: "12-21" },
+            { name: "乃東生", meaning: "Prunella sprouts.", start: "12-22", end: "12-26" },
+            { name: "麋角解", meaning: "Deer shed their antlers.", start: "12-27", end: "12-31" },
+            { name: "雪下出麦", meaning: "Barley sprouts under the snow.", start: "01-01", end: "01-04" },
+            { name: "芹乃栄", meaning: "Parsley thrives.", start: "01-05", end: "01-09" },
+            { name: "水泉動", meaning: "Springs once frozen flow once more.", start: "01-10", end: "01-14" },
+            { name: "雉始雊", meaning: "Cock pheasants begin to call.", start: "01-15", end: "01-19" },
+            { name: "款冬華", meaning: "Butterburs put forth buds.", start: "01-20", end: "01-24" },
+            { name: "水沢腹堅", meaning: "Mountain streams gain a cover of thick ice.", start: "01-25", end: "01-29" },
+            { name: "鶏始乳", meaning: "Hens begin to lay eggs.", start: "01-30", end: "02-03" }
+        ];
+
+        function getCurrentYear() {
+            const now = new Date();
+            return now.getFullYear();
+        }
+
+        function formatDate(year, dateStr) {
+            const [month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        function getCurrentSekki() {
+            const now = new Date();
+            const currentYear = getCurrentYear();
+            
+            for (const sekki of sekkiData) {
+                const startDate = formatDate(currentYear, sekki.start);
+                const endDate = formatDate(currentYear, sekki.end);
+                
+                // Handle year wrap-around for endDate
+                if (endDate < startDate) {
+                    endDate.setFullYear(currentYear + 1);
+                }
+                
+                if (now >= startDate && now <= endDate) {
+                    return sekki;
+                }
+            }
+            return null;
+        }
+
+        function updateSekki(sekki) {
+            const now = new Date();
+            const month = now.getMonth();
+            
+            let backgroundColor;
+            if (month >= 2 && month < 5) {
+                // Spring
+                backgroundColor = '#dff0d8'; // Light green
+            } else if (month >= 5 && month < 8) {
+                // Summer
+                backgroundColor = '#f7f9fc'; // Light blue
+            } else if (month >= 8 && month < 11) {
+                // Autumn
+                backgroundColor = '#fdf4d1'; // Light yellow
+            } else {
+                // Winter
+                backgroundColor = '#e9f7ff'; // Light cyan
+            }
+
+            document.body.style.backgroundColor = backgroundColor;
+
+            if (sekki) {
+                document.getElementById('japanese-name').textContent = sekki.name;
+                document.getElementById('english-meaning').textContent = sekki.meaning;
+                document.getElementById('dates').textContent = `From ${sekki.start} to ${sekki.end}`;
+            } else {
+                document.getElementById('japanese-name').textContent = "Sekki not found";
+                document.getElementById('english-meaning').textContent = "";
+                document.getElementById('dates').textContent = "";
+            }
+        }
+
+        function getSekkiIndex(sekkiName) {
+            return sekkiData.findIndex(sekki => sekki.name === sekkiName);
+        }
+
+        function prevSekki() {
+            const currentSekki = document.getElementById('japanese-name').textContent;
+            const currentIndex = getSekkiIndex(currentSekki);
+            const prevIndex = (currentIndex > 0) ? currentIndex - 1 : sekkiData.length - 1;
+            updateSekki(sekkiData[prevIndex]);
+        }
+
+        function nextSekki() {
+            const currentSekki = document.getElementById('japanese-name').textContent;
+            const currentIndex = getSekkiIndex(currentSekki);
+            const nextIndex = (currentIndex < sekkiData.length - 1) ? currentIndex + 1 : 0;
+            updateSekki(sekkiData[nextIndex]);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentSekki = getCurrentSekki();
+            updateSekki(currentSekki);
+        });
+    </script>
+</body>
+</html>
